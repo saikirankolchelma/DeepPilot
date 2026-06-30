@@ -33,23 +33,60 @@ class OllamaModel(BaseModel):
         return self._clean_think_tags(content)
 
     def generate_json(self, prompt: str, schema: Type[T], **kwargs) -> T:
+        # First attempt: LangChain structured output
         try:
             llm_with_tools = self.llm.with_structured_output(schema)
             res = llm_with_tools.invoke(prompt)
-            if res is not None:
+            if res is not None and (isinstance(res, schema) or hasattr(res, 'dict') or hasattr(res, 'model_dump')):
                 return res
         except Exception:
             pass
             
-        # Fallback for models that do not natively support structured output
-        json_prompt = f"{prompt}\n\nOutput ONLY valid JSON conforming exactly to this schema:\n{schema.schema_json()}"
-        raw_res = self.generate(json_prompt)
+        # Second attempt: Native JSON constraint with explicit examples to prevent schema echoing
+        schema_dict = schema.model_json_schema() if hasattr(schema, 'model_json_schema') else schema.schema()
+        keys = list(schema_dict.get('properties', {}).keys())
         
-        # Extract json block if present
-        json_match = re.search(r'```(?:json)?\s*(.*?)\s*```', raw_res, re.DOTALL)
-        clean_json = json_match.group(1) if json_match else raw_res.strip()
+        example_hint = ""
+        if schema.__name__ == "PlanOutput":
+            example_hint = """
+Example response format:
+{
+  "goal": "Implement feature X",
+  "steps": [
+    {"step_number": 1, "description": "Research existing architecture", "component": "Research"},
+    {"step_number": 2, "description": "Implement core logic", "component": "Coding"},
+    {"step_number": 3, "description": "Run automated unit tests", "component": "Testing"}
+  ]
+}"""
+        elif schema.__name__ == "ReflectionOutput":
+            example_hint = """
+Example response format:
+{
+  "is_correct": true,
+  "critique": "The solution meets all requirements clearly.",
+  "suggestions": ["Add more inline comments"]
+}"""
+
+        json_prompt = f"""{prompt}
+
+CRITICAL INSTRUCTION:
+Return ONLY a valid JSON data object containing the keys: {keys}.
+Do NOT return JSON schema definitions (do NOT output '$defs' or 'properties'). Fill in actual data values.
+{example_hint}"""
+
+        try:
+            # Bind format="json" natively to Ollama API to force valid JSON token output
+            json_llm = self.llm.bind(format="json")
+            raw_res = json_llm.invoke(json_prompt)
+            content = raw_res.content if hasattr(raw_res, 'content') else str(raw_res)
+        except Exception:
+            content = self.generate(json_prompt)
+            
+        clean_content = self._clean_think_tags(content)
+        json_match = re.search(r'```(?:json)?\s*(.*?)\s*```', clean_content, re.DOTALL)
+        clean_json = json_match.group(1) if json_match else clean_content.strip()
         
-        # Try validating with Pydantic v2 or v1
+        # Validate with Pydantic
         if hasattr(schema, 'model_validate_json'):
             return schema.model_validate_json(clean_json)
         elif hasattr(schema, 'parse_raw'):
