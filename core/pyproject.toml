@@ -1,7 +1,7 @@
 [project]
-name = "deep-ai-engineer"
+name = "deeppilot-core"
 version = "0.1.0"
-description = "Autonomous AI Engineer System"
+description = "Autonomous AI Engineer System Engine"
 readme = "README.md"
 requires-python = ">=3.10,<3.13"
 dependencies = [

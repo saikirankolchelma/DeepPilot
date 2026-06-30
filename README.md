@@ -49,12 +49,12 @@ ollama pull nomic-embed-text
 Navigate into the core package directory and install dependencies:
 
 ```bash
-cd deep_ai_engineer
+cd core
 pip install -r requirements.txt
 ```
 
 ### 3. Environment Configuration
-Create or inspect your `.env` inside `deep_ai_engineer`:
+Create or inspect your `.env` inside `core`:
 
 ```env
 OLLAMA_HOST=http://localhost:11434
@@ -73,23 +73,16 @@ EMBEDDING_MODEL=nomic-embed-text
 
 ## 🚀 Running DeepPilot
 
-### Start the Backend API Server
-Launch the FastAPI workflow orchestration backend:
+### Launch the Full System (Backend API + Interactive UI)
+Launch the FastAPI workflow server inside `core`:
 
 ```bash
-cd deep_ai_engineer
+cd core
 uvicorn api.main:app --reload --port 8000
 ```
-*API Documentation will be available at `http://127.0.0.1:8000/docs`.*
 
-### Start the Interactive Frontend
-In a separate terminal window, launch the Streamlit workspace dashboard:
-
-```bash
-cd deep_ai_engineer
-streamlit run frontend/app.py
-```
-*Access the workspace UI at `http://localhost:8501` to submit engineering tasks and monitor live agent execution.*
+- **🌐 Interactive UI Command Center**: Open your browser at **`http://127.0.0.1:8000`** to access the dynamic cyberpunk HTML/CSS workspace deck!
+- **📜 Swagger API Docs**: Access REST documentation at `http://127.0.0.1:8000/docs`.
 
 ---
 

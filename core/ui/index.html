@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepPilot | Autonomous Multi-Agent AI Engineer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Glass Navigation Bar -->
+        <header class="navbar">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fa-solid fa-plane-up"></i></div>
+                <span class="logo-text">Deep<span class="highlight">Pilot</span></span>
+                <span class="badge version-badge">v0.1.0 Offline</span>
+            </div>
+            <div class="status-indicators">
+                <div class="pill-indicator online">
+                    <span class="pulse-dot"></span>
+                    <span>Ollama Connected (Localhost)</span>
+                </div>
+                <div class="pill-indicator model-pill">
+                    <i class="fa-solid fa-microchip"></i>
+                    <span>DeepSeek-R1 & Qwen2.5-Coder</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <!-- Left/Top Section: Goal Input & Pipeline Stepper -->
+            <section class="command-center">
+                <div class="panel glass-panel input-panel">
+                    <div class="panel-header">
+                        <h2><i class="fa-solid fa-terminal"></i> Engineering Command Deck</h2>
+                        <span class="subtitle">Assign high-level software engineering tasks to the multi-agent swarm</span>
+                    </div>
+                    
+                    <div class="prompt-box">
+                        <textarea id="taskInput" placeholder="Describe what you want to build or debug... e.g. 'Build a high-performance FastAPI CRUD service for managing inventory with authentication and unit tests'"></textarea>
+                        <div class="prompt-actions">
+                            <div class="starter-chips">
+                                <span class="chip" onclick="setPrompt('Build a complete FastAPI REST API for a digital bookstore with Pydantic models')">⚡ FastAPI Bookstore</span>
+                                <span class="chip" onclick="setPrompt('Create a robust Python web scraper using BeautifulSoup with error handling and logging')">🕸️ Web Scraper</span>
+                                <span class="chip" onclick="setPrompt('Implement a rate-limiting middleware in Python using token bucket algorithm')">🛡️ Rate Limiter</span>
+                            </div>
+                            <button id="startBtn" class="btn primary-btn">
+                                <i class="fa-solid fa-rocket"></i> Launch Autonomous Swarm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agent Pipeline Stepper -->
+                <div class="panel glass-panel pipeline-panel">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-diagram-project"></i> LangGraph Agent Swarm Pipeline</h3>
+                        <span id="currentStatusText" class="status-label idle">Status: IDLE</span>
+                    </div>
+                    <div class="stepper-grid">
+                        <div class="step-card" id="step-planner">
+                            <div class="step-icon"><i class="fa-solid fa-brain"></i></div>
+                            <div class="step-info">
+                                <h4>Planner</h4>
+                                <span>Architecture breakdown</span>
+                            </div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-card" id="step-researcher">
+                            <div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <div class="step-info">
+                                <h4>Researcher</h4>
+                                <span>Technical context</span>
+                            </div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-card" id="step-coder">
+                            <div class="step-icon"><i class="fa-solid fa-code"></i></div>
+                            <div class="step-info">
+                                <h4>Coder</h4>
+                                <span>Code generation</span>
+                            </div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-card" id="step-tester">
+                            <div class="step-icon"><i class="fa-solid fa-vial"></i></div>
+                            <div class="step-info">
+                                <h4>Tester</h4>
+                                <span>Pytest execution</span>
+                            </div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-card" id="step-debugger">
+                            <div class="step-icon"><i class="fa-solid fa-bug-slash"></i></div>
+                            <div class="step-info">
+                                <h4>Debugger</h4>
+                                <span>Autofs error loops</span>
+                            </div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-card" id="step-reflector">
+                            <div class="step-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                            <div class="step-info">
+                                <h4>Reflector</h4>
+                                <span>Staff critique</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results & Output Tabs -->
+            <section class="results-center">
+                <div class="panel glass-panel results-panel">
+                    <!-- Navigation Tabs -->
+                    <div class="tabs-header">
+                        <button class="tab-btn active" onclick="switchTab('tab-plan')">
+                            <i class="fa-solid fa-list-check"></i> Execution Plan
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('tab-code')">
+                            <i class="fa-solid fa-file-code"></i> Generated Code
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('tab-tests')">
+                            <i class="fa-solid fa-terminal"></i> Test & Debug Console
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('tab-reflection')">
+                            <i class="fa-solid fa-star"></i> Agent Reflection
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('tab-memory')">
+                            <i class="fa-solid fa-database"></i> ChromaDB Memory
+                        </button>
+                    </div>
+
+                    <!-- Tab Contents -->
+                    <div class="tab-content active" id="tab-plan">
+                        <div class="empty-state" id="planEmpty">
+                            <i class="fa-solid fa-compass-drafting"></i>
+                            <p>No execution plan generated yet. Launch a task to see the architectural blueprint.</p>
+                        </div>
+                        <div id="planContainer" class="hidden"></div>
+                    </div>
+
+                    <div class="tab-content" id="tab-code">
+                        <div class="code-header">
+                            <span class="file-tag"><i class="fa-brands fa-python"></i> workspace/main.py</span>
+                            <button class="btn secondary-btn small-btn" onclick="copyCode()">
+                                <i class="fa-regular fa-copy"></i> Copy Code
+                            </button>
+                        </div>
+                        <pre><code id="codeBlock" class="language-python"># Output code will appear here after Coding Agent finishes execution...</code></pre>
+                    </div>
+
+                    <div class="tab-content" id="tab-tests">
+                        <div class="terminal-box">
+                            <div class="terminal-topbar">
+                                <span><i class="fa-solid fa-desktop"></i> DeepPilot Sandbox Terminal (pytest)</span>
+                            </div>
+                            <pre id="testOutput">Awaiting physical test execution in sandbox workspace...</pre>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-reflection">
+                        <div id="reflectionContainer">
+                            <div class="empty-state">
+                                <i class="fa-solid fa-clipboard-check"></i>
+                                <p>Staff reflection and review critique will appear here.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-memory">
+                        <div class="memory-search-bar">
+                            <input type="text" id="memoryQuery" placeholder="Query semantic patterns in local ChromaDB...">
+                            <button class="btn primary-btn small-btn" onclick="searchMemory()">Search</button>
+                        </div>
+                        <div id="memoryResults" class="memory-grid">
+                            <p class="hint-text">Type a concept to search past learned patterns in your ChromaDB database.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
