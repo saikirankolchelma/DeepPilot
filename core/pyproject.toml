@@ -3,25 +3,24 @@ name = "deeppilot-core"
 version = "0.1.0"
 description = "Autonomous AI Engineer System Engine"
 readme = "README.md"
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10"
 dependencies = [
-    "fastapi",
-    "uvicorn",
-    "langchain",
-    "langgraph",
-    "chromadb",
-    "sentence-transformers",
-    "langchain-community",
-    "streamlit",
-    "requests",
-    "ollama",
-    "faiss-cpu",
-    "pydantic",
-    "python-dotenv",
-    "pytest",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+    "langchain>=0.2.0",
+    "langgraph>=0.1.0",
+    "chromadb>=0.5.0",
+    "sentence-transformers>=2.6.0",
+    "langchain-community>=0.2.0",
+    "streamlit>=1.35.0",
+    "requests>=2.31.0",
+    "ollama>=0.2.0",
+    "faiss-cpu>=1.8.0",
+    "pydantic>=2.7.0",
+    "python-dotenv>=1.0.1",
+    "pytest>=8.0.0",
 ]
 
-[dependency-groups]
-dev = [
-    # Add any dev dependencies here if needed in the future
-]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
