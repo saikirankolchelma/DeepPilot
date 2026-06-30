@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+langchain
+langgraph
+chromadb
+sentence-transformers
+langchain-community
+streamlit
+requests
+ollama
+faiss-cpu
+pydantic
+python-dotenv
+pytest

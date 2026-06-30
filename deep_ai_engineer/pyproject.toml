@@ -1,0 +1,27 @@
+[project]
+name = "deep-ai-engineer"
+version = "0.1.0"
+description = "Autonomous AI Engineer System"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "langchain",
+    "langgraph",
+    "chromadb",
+    "sentence-transformers",
+    "langchain-community",
+    "streamlit",
+    "requests",
+    "ollama",
+    "faiss-cpu",
+    "pydantic",
+    "python-dotenv",
+    "pytest",
+]
+
+[dependency-groups]
+dev = [
+    # Add any dev dependencies here if needed in the future
+]
