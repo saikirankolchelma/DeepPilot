@@ -34,9 +34,11 @@ def extract_code_block(text: str) -> str:
 
 def plan_node(state: AgentState) -> AgentState:
     print(f"--- PLANNING TASK: {state['user_goal']} ---")
+    selected_model = router.set_workflow_tier_from_query(state['user_goal'])
+    print(f"--- DYNAMIC TIER SELECTOR: Routed workflow to model '{selected_model}' ({router.current_tier.upper()}) ---")
     plan = planner.generate_plan(state['user_goal'])
     state['plan'] = plan
-    memory.store_short_term(state['task_id'], "Planning", "Generated execution plan.")
+    memory.store_short_term(state['task_id'], "Planning", f"Generated execution plan using {selected_model}.")
     return state
 
 def research_node(state: AgentState) -> AgentState:
