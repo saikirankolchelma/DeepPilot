@@ -9,9 +9,12 @@ load_dotenv()
 class LocalOllamaEmbeddingFunction(EmbeddingFunction):
     def __init__(self):
         self.base_url = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-        self.model_name = os.getenv("EMBEDDING_MODEL", "deepseek-r1:8b")
+        self.model_name = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
         try:
-            from langchain_community.embeddings import OllamaEmbeddings
+            try:
+                from langchain_ollama import OllamaEmbeddings
+            except ImportError:
+                from langchain_community.embeddings import OllamaEmbeddings
             self.embeddings = OllamaEmbeddings(model=self.model_name, base_url=self.base_url)
         except Exception:
             self.embeddings = None
@@ -34,8 +37,6 @@ class ChromaManager:
         
         # Initialize persistent client
         self.client = chromadb.PersistentClient(path=db_path)
-        
-        # Use Local Ollama / SentenceTransformer embeddings
         self.embedding_fn = LocalOllamaEmbeddingFunction()
         
         # Initialize collections
@@ -52,18 +53,41 @@ class ChromaManager:
             embedding_function=self.embedding_fn
         )
 
+    def _get_collection_safe(self, collection_name: str):
+        return self.client.get_or_create_collection(name=collection_name, embedding_function=self.embedding_fn)
+
     def add_to_memory(self, collection_name: str, doc_id: str, text: str, metadata: dict = None):
-        collection = self.client.get_collection(name=collection_name, embedding_function=self.embedding_fn)
-        collection.add(
-            documents=[text],
-            metadatas=[metadata] if metadata else None,
-            ids=[doc_id]
-        )
+        collection = self._get_collection_safe(collection_name)
+        try:
+            collection.add(
+                documents=[text],
+                metadatas=[metadata] if metadata else None,
+                ids=[doc_id]
+            )
+        except Exception as e:
+            if "dimension" in str(e).lower() or "expecting embedding with dimension" in str(e).lower():
+                # Stale collection from old Gemini embedding model (3072 dims vs 768 dims). Delete and recreate.
+                self.client.delete_collection(name=collection_name)
+                collection = self._get_collection_safe(collection_name)
+                collection.add(
+                    documents=[text],
+                    metadatas=[metadata] if metadata else None,
+                    ids=[doc_id]
+                )
+            else:
+                raise e
 
     def search_memory(self, collection_name: str, query: str, n_results: int = 3):
-        collection = self.client.get_collection(name=collection_name, embedding_function=self.embedding_fn)
-        results = collection.query(
-            query_texts=[query],
-            n_results=n_results
-        )
-        return results
+        collection = self._get_collection_safe(collection_name)
+        try:
+            results = collection.query(
+                query_texts=[query],
+                n_results=n_results
+            )
+            return results
+        except Exception as e:
+            if "dimension" in str(e).lower() or "expecting embedding with dimension" in str(e).lower():
+                self.client.delete_collection(name=collection_name)
+                collection = self._get_collection_safe(collection_name)
+                return {"documents": [[]], "metadatas": [[]], "distances": [[]]}
+            raise e

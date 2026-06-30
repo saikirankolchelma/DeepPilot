@@ -1,7 +1,10 @@
 import os
 import re
 import json
-from langchain_community.chat_models import ChatOllama
+try:
+    from langchain_ollama import ChatOllama
+except ImportError:
+    from langchain_community.chat_models import ChatOllama
 from models.base_model import BaseModel
 from dotenv import load_dotenv
 from typing import Type, TypeVar
